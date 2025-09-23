@@ -61,25 +61,25 @@ $(function () {
   let keyword = '';//キーワードを保存するための変数を設定
 
   $('.search-btn').on('click', function () {//.search-btnクラスを持つ要素がクリックされた際に作動
-    const WordS = $('#search-input').val();//#search-input(検索ワードを入力)に入力されたデータを.val();で取得し、変数WordSに渡す。
+    const searchWord = $('#search-input').val();//#search-input(検索ワードを入力)に入力されたデータを.val();で取得し、変数searchWordに渡す。
 
-    if (WordS === '') {//もしWordSの中身がなかった場合
+    if (searchWord === '') {//もしsearchWordの中身がなかった場合
       Fail({ status: 400 }); //else if (xhr.status === 400)で設定したエラーメッセージを表示。
       return; // ここで処理を終了
     }
 
     // 検索ワードが変わったらページカウントをリセット
-    if (WordS !== keyword) {//もし、WordSの内容が変更された(!==、等しくない)場合
+    if (searchWord !== keyword) {//もし、searchWordの内容が変更された(!==、等しくない)場合
       pageCount = 1;//ページカウントを1にします。
       $('.lists').empty();//.listsクラスを持つ要素を.empty();で空にします。
-      keyword = WordS;//WordSの値をkeywordに保存します。
+      keyword = searchWord;//searchWordの値をkeywordに保存します。
     } else { //検索ワードが変わっていない場合の条件を記入
       pageCount++;
     }
 
     //ajax通信の記述
     $.ajax({
-      url: `https://ci.nii.ac.jp/books/opensearch/search?title=${WordS}&format=json&p=${pageCount}&count=20`,//CiNii BooksのAPI通信URLに?title=${WordS}(本のタイトル、WordSで取得したもの)と、${pageCount}(現在のページ番号)を埋め込む。&count=20で、1ページの検索結果表示を20件に指定。&format=jsonで、データ形式をJSONに指定。
+      url: `https://ci.nii.ac.jp/books/opensearch/search?title=${searchWord}&format=json&p=${pageCount}&count=20`,//CiNii BooksのAPI通信URLに?title=${searchWord}(本のタイトル、searchWordで取得したもの)と、${pageCount}(現在のページ番号)を埋め込む。&count=20で、1ページの検索結果表示を20件に指定。&format=jsonで、データ形式をJSONに指定。
       method: 'GET',//method:でサーバーへのリクエストの種類を指定。今回はGETを指定
     })
       .done(Success)//リクエスト成功時、Success、Ajax通信が成功した際の記述を呼び出す。
@@ -97,3 +97,5 @@ $(function () {
  });
 
 
+//WordSのSですが、selectの頭文字のSを取って命名しました。命名規則に沿っていなかったため修正いたしました。
+//xhrですが、XMLHttpRequestの略です。調べている際に引数にxhrを使用している事例を見かけたため、私も使用しました。
