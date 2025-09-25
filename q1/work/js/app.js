@@ -47,16 +47,16 @@ $(function() {
 
   //クリック時のイベント記載。今回はリストに適用するためliを指定。.index()で番号を取得。xに数字を代入。alert内に表示内容を記載。今回はxを記載。
   $('#q9 li').click(function() {
-    var x = $(this).index();
-    alert(x);
+    const a = $(this).index();
+    alert(a);
   });
 
   //操作するのは#q10のリストのため記載。
   $('#q10 li').click(function() {
     //クリック時のイベント記載。今回はリストに適用するためliを指定。.index()でクリックした要素が何番目かを取得。Xに代入。
-    const x = $(this).index();
+    const a = $(this).index();
     //変更対象の#q11 liを記載。.eq(x)でq11のリストの何番目かを認識。addClassで、cssのlarge-textを呼び出し。
-    $('#q11 li').eq(x).addClass('large-text');
+    $('#q11 li').eq(a).addClass('large-text');
   });
 });
 //変数xですが、数学でよく使用するx(数字を代入する値)としてわかりやすいかと思い命名しました。

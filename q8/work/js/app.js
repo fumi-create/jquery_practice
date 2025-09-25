@@ -40,11 +40,11 @@ $(function () {
     }
   }
 
-  function Success(response) {//Ajax通信が成功した際の記述。
+  function success(response) {//Ajax通信が成功した際の記述。
     display(response['@graph']);//response['@graph']を使用して、書籍データの配列を取り出します。それを変数displayに引き渡たす。
   }
 
-  function Fail(xhr) {//Ajax通信が失敗した際の記述
+  function fail(xhr) {//Ajax通信が失敗した際の記述
     $('.lists').empty(); // .empty()で.listsクラスを持つコンテンツを空にする。
     $('.message').remove(); // .messageを持つコンテンツを.remove();で削除
     let error = '予期せぬエラーが起きました。<br>再読み込みを行ってください。';//letで変数 errorに予期せぬエラーが起きました。<br>再読み込みを行ってくださいを定義
@@ -82,8 +82,8 @@ $(function () {
       url: `https://ci.nii.ac.jp/books/opensearch/search?title=${searchWord}&format=json&p=${pageCount}&count=20`,//CiNii BooksのAPI通信URLに?title=${searchWord}(本のタイトル、searchWordで取得したもの)と、${pageCount}(現在のページ番号)を埋め込む。&count=20で、1ページの検索結果表示を20件に指定。&format=jsonで、データ形式をJSONに指定。
       method: 'GET',//method:でサーバーへのリクエストの種類を指定。今回はGETを指定
     })
-      .done(Success)//リクエスト成功時、Success、Ajax通信が成功した際の記述を呼び出す。
-      .fail(Fail);//リクエスト失敗時、Fail、Ajax通信が失敗した際の記述を呼び出す。
+      .done(success)//リクエスト成功時、success、Ajax通信が成功した際の記述を呼び出す。
+      .fail(fail);//リクエスト失敗時、fail、Ajax通信が失敗した際の記述を呼び出す。
   });
 
   // 以下、リセットボタンの記述
