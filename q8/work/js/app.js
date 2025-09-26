@@ -1,15 +1,3 @@
-// API
-// const settings = {
-//   "url": `https://ci.nii.ac.jp/books/opensearch/search?title=${searchWord}&format=json&p=${pageCount}&count=20`,
-//   "method": "GET",
-// }
-// $.ajax(settings).done(function (response) {
-//   const result = response['@graph'];
-//   displayResult(result)
-// }).fail(function (err) {
-//   displayError(err)
-// });
-
 $(function () {
   //以下検索結果を表記
   function display(data) {//displayを結果を表示する関数として設定。引数としてdataを受け取るようにする。
@@ -95,7 +83,3 @@ $(function () {
     $('#search-input').val('');//#search-input(検索ワードを入力)に入力されたデータを''で空にします。
   });
  });
-
-
-//WordSのSですが、selectの頭文字のSを取って命名しました。命名規則に沿っていなかったため修正いたしました。
-//xhrですが、XMLHttpRequestの略です。調べている際に引数にxhrを使用している事例を見かけたため、私も使用しました。
