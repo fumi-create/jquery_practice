@@ -52,7 +52,7 @@ $(function () {
     const searchWord = $('#search-input').val();//#search-input(検索ワードを入力)に入力されたデータを.val();で取得し、変数searchWordに渡す。
 
     if (searchWord === '') {//もしsearchWordの中身がなかった場合
-      Fail({ status: 400 }); //else if (xhr.status === 400)で設定したエラーメッセージを表示。
+      fail({ status: 400 }); //else if (xhr.status === 400)で設定したエラーメッセージを表示。
       return; // ここで処理を終了
     }
 
