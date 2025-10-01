@@ -28,20 +28,18 @@ $(function () {
     }
   }
 
-  function success(response) {//Ajax通信が成功した際の記述。
-    display(response['@graph']);//response['@graph']を使用して、書籍データの配列を取り出します。それを変数displayに引き渡たす。
+  //Ajax通信が成功した際の記述。
+  function success(response) {
+    // display(response['@graph']);//response['@graph']を使用して、書籍データの配列を取り出します。それを変数displayに引き渡たす。
+    display(response['@graph']);
   }
 
-  function fail(xhr) {//Ajax通信が失敗した際の記述
+  //Ajax通信が失敗した際の記述
+  function processError(textStatus) { //processErrorをエラーメッセージを表示する関数として設定。
     $('.lists').empty(); // .empty()で.listsクラスを持つコンテンツを空にする。
     $('.message').remove(); // .messageを持つコンテンツを.remove();で削除
     let error = '予期せぬエラーが起きました。<br>再読み込みを行ってください。';//letで変数 errorに予期せぬエラーが起きました。<br>再読み込みを行ってくださいを定義
-
-    if (xhr.status === 0) {//xhr.statusがゼロ、ネットワークエラーが起きた場合の記述
-      error = '正常に通信できませんでした。<br>インターネットの接続を確認してください。';//変数 errorにエラーメッセージを定義
-    } else if (xhr.status === 400) {//xhr.statusが400、クライアントエラーが起きた場合の記述。
-      error = '検索キーワードが有効ではありません。<br>1文字以上で検索してください。';//変数 errorにエラーメッセージを定義
-    }
+    
     $('.lists').before(`<div class='message'>${error}</div>`);//.beforeを使って、errorを挿入。
   }
 
@@ -51,9 +49,15 @@ $(function () {
   $('.search-btn').on('click', function () {//.search-btnクラスを持つ要素がクリックされた際に作動
     const searchWord = $('#search-input').val();//#search-input(検索ワードを入力)に入力されたデータを.val();で取得し、変数searchWordに渡す。
 
-    if (searchWord === '') {//もしsearchWordの中身がなかった場合
-      fail({ status: 400 }); //else if (xhr.status === 400)で設定したエラーメッセージを表示。
-      return; // ここで処理を終了
+    if (searchWord === '') {//もしsearchWordの中身がなかった場
+      
+      // エラーメッセージを表示
+      $('.lists').empty(); // .empty()で一旦リストを空にする
+      $('.message').remove(); // .remove()で既存のメッセージを削除
+      const validationMessage = '検索キーワードが有効ではありません。<br>1文字以上で検索してください。';// エラーメッセージを定義
+      $('.lists').before(`<div class='message'>${validationMessage}</div>`);// エラーメッセージを挿入
+      
+      return; 
     }
 
     // 検索ワードが変わったらページカウントをリセット
@@ -71,7 +75,7 @@ $(function () {
       method: 'GET',//method:でサーバーへのリクエストの種類を指定。今回はGETを指定
     })
       .done(success)//リクエスト成功時、success、Ajax通信が成功した際の記述を呼び出す。
-      .fail(fail);//リクエスト失敗時、fail、Ajax通信が失敗した際の記述を呼び出す。
+      .fail(processError);//リクエスト失敗時、processError、Ajax通信が失敗した際の記述を呼び出す。
   });
 
   // 以下、リセットボタンの記述
@@ -82,4 +86,4 @@ $(function () {
     $('.message').remove();// .messageを持つコンテンツを.remove();で削除
     $('#search-input').val('');//#search-input(検索ワードを入力)に入力されたデータを''で空にします。
   });
- });
+});
