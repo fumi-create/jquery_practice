@@ -3,7 +3,7 @@ $(function () {
 	function onAjaxSuccess(response) {
 		$('.message').remove(); // 既存のメッセージを.remove()で削除
 		// データを response['@graph']?.[0] で取得
-		const items = response['@graph']?.[0]?.items; 
+		const items = response['@graph']?.[0]?.items;
 
 		if (items && items.length > 0) {//もし検索結果が存在した場合　itemsとitems.length(itemsの総数)が0より多い場合の条件式
 			$.each(items, function (index, book) {//eachを利用してループ処理。itemsに対して、indexでitems内の数をカウント、book(itemsの配列内の要素(title:～)をbookという変数指定)でデータを取り出す。
@@ -30,27 +30,38 @@ $(function () {
 	}
 
 	//Ajax通信が失敗した際の記述
-	// .fail(function (jqXHR, textStatus, errorThrown) { onAjaxError(jqXHR, textStatus, errorThrown); }); から呼ばれるため、3つの引数を受け取るようにします。
-	function onAjaxError(jqXHR, textStatus, errorThrown) { 
+	function onAjaxError(jqXHR, textStatus, errorThrown) {
 		$('.lists').empty(); // .empty()で.listsクラスを持つコンテンツを空にする。
 		$('.message').remove(); // .messageを持つコンテンツを.remove();で削除
-		
+
 		let error = '予期せぬエラーが起きました。<br>再読み込みを行ってください。';//letで変数 errorに予期せぬエラーが起きました。<br>再読み込みを行ってくださいを定義
-		
-		// 以前のコード（processError）を参考に、textStatusに基づいてエラーメッセージを分岐
+
+		// jqXHR.statusに基づいてエラーメッセージを分岐
+		const status = jqXHR.status;
+
 		if (textStatus === 'timeout') {
-			error = '通信がタイムアウトしました。<br>インターネットの接続を確認してください。';//変数 errorにエラーメッセージを定義
+			// ステータスコードではなく、jQueryのタイムアウト（textStatus）で検出
+			error = '通信がタイムアウトしました。<br>インターネットの接続を確認してください。';
 		} else if (textStatus === 'abort') {
-			// 処理を中断した場合など
-			error = '検索処理が中断されました。';//変数 errorにエラーメッセージを定義
-		} else if (textStatus === 'error') {
-			// ネットワークエラーや、CORS関連のブロック、サーバーからのレスポンスがない場合（以前のstatus=0を含む）
-			error = '正常に通信できませんでした。<br>インターネットの接続を確認するか、しばらくしてからお試しください。';//変数 errorにエラーメッセージを定義
-		} else {
-			// その他の不明なエラーやサーバー側で発生したエラー
+			// 処理を中断した場合など（textStatus）で検出
+			error = '検索処理が中断されました。';
+		} else if (status === 404) {
+			// 404 Not Found
+			error = '指定されたリソースが見つかりませんでした。';
+		} else if (status >= 500) {
+			// 5xx Server Error
 			error = 'サーバーで問題が発生しました。<br>時間をおいてから再度お試しください。';
+		} else if (status >= 400) {
+			// 4xx Client Error (404以外)
+			error = 'リクエストに問題が発生しました。<br>入力内容を確認してください。';
+		} else if (status === 0) {
+			// statusが0の場合: ネットワークエラー、CORSブロック、サーバーからの応答なしなど
+			error = '正常に通信できませんでした。<br>インターネットの接続を確認するか、しばらくしてからお試しください。';
+		} else {
+			// その他の不明なエラー
+			error = `サーバーで問題が発生しました。（Status: ${status}）<br>時間をおいてから再度お試しください。`;
 		}
-		
+
 		$('.lists').before(`<div class='message'>${error}</div>`);//.beforeを使って、errorを挿入。
 	}
 
@@ -61,14 +72,14 @@ $(function () {
 		const searchWord = $('#search-input').val();//#search-input(検索ワードを入力)に入力されたデータを.val();で取得し、変数searchWordに渡す。
 
 		if (searchWord === '') {//もしsearchWordの中身がなかった場
-			
+
 			// エラーメッセージを表示
 			$('.lists').empty(); // .empty()で一旦リストを空にする
 			$('.message').remove(); // .remove()で既存のメッセージを削除
 			const validationMessage = '検索キーワードが有効ではありません。<br>1文字以上で検索してください。';// エラーメッセージを定義
 			$('.lists').before(`<div class='message'>${validationMessage}</div>`);// エラーメッセージを挿入
-			
-			return; 
+
+			return;
 		}
 
 		// 検索ワードが変わったらページカウントをリセット
@@ -84,10 +95,11 @@ $(function () {
 		$.ajax({
 			url: `https://ci.nii.ac.jp/books/opensearch/search?title=${searchWord}&format=json&p=${pageCount}&count=20`,//CiNii BooksのAPI通信URLに?title=${searchWord}(本のタイトル、searchWordで取得したもの)と、${pageCount}(現在のページ番号)を埋め込む。&count=20で、1ページの検索結果表示を20件に指定。&format=jsonで、データ形式をJSONに指定。
 			method: 'GET',//method:でサーバーへのリクエストの種類を指定。今回はGETを指定
+			timeout: 10000 // タイムアウトを設定（例：10秒）
 		})
 			.done(onAjaxSuccess)//リクエスト成功時、onAjaxSuccess、Ajax通信が成功した際の記述を呼び出す。
 			.fail(function (jqXHR, textStatus, errorThrown) {
-				// onAjaxError関数が引数（textStatusなど）を受け取って処理するように変更されたため、.failのコールバックでそれを呼び出します。
+				// onAjaxError関数が引数（jqXHR, textStatus, errorThrown）を受け取って処理するように修正したため、それを呼び出します。
 				onAjaxError(jqXHR, textStatus, errorThrown);
 			});
 	});
@@ -101,3 +113,9 @@ $(function () {
 		$('#search-input').val('');//#search-input(検索ワードを入力)に入力されたデータを''で空にします。
 	});
 });
+
+
+
+
+
+
